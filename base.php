@@ -8,14 +8,12 @@ class DB{
     protected $pw='';
     protected $pdo;
     protected $table;
-   
+
 
     public function __construct($table){
         $this->table=$table;
         $this->pdo=new PDO($this->dsn,$this->user,$this->pw);
     }
-
-    
 
     public function find($id){
         $sql="SELECT * FROM $this->table WHERE ";
@@ -146,24 +144,26 @@ $View=new DB('view');
 $Que=new DB('que');
 $Log=new DB('log');
 
-//找瀏覽人數 ,有 +1  ,沒有  增加瀏覽 +1
 
-
+/**
+ * 先找到有沒有今日的瀏灠人數紀錄
+ *   * 有->瀏灠人次加1
+ *   * 沒有->增加今日的新紀錄,瀏灠人次為1
+ */
 
 if(!isset($_SESSION['view'])){
-   if($View->math('count','*',['date'=>date("Y-m-d")])>0){
-    $view=$View->find(['date'=>date("Y-m-d")]);
-    // $view['total']++;
-    $view['total']+=1;
-    $View->save($view);
-    $_SESSION['view']=$view['total'];
-
-   }else{
-       $View->save(['date'=>date("Y-m-d"),'total'=>1]);
-       $_SESSION['view']=1;
-   }
-
-
+    
+    if($View->math('count','*',['date'=>date("Y-m-d")])>0){
+        $view=$View->find(['date'=>date("Y-m-d")]);
+        //$view['total']++
+        //$view['total']=$view['total']+1;
+        $view['total']+=1;
+        $View->save($view);
+        $_SESSION['view']=$view['total'];
+    }else{
+        $View->save(['date'=>date("Y-m-d"),'total'=>1]);
+        $_SESSION['view']=1;
+    }
 }
 
 
